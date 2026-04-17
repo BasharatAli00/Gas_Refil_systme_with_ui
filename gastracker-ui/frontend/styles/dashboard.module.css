@@ -1,0 +1,307 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: var(--bg-page);
+  color: var(--text-primary);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: var(--accent);
+}
+
+.topSection {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .topSection {
+    grid-template-columns: 1fr;
+  }
+}
+
+.panel {
+  background-color: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: 20px;
+}
+
+.panelHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.panelHeader h2 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--text-muted);
+}
+
+.refreshBtn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.refreshBtn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Chat Styling */
+.chatSection {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.chatHistory {
+  height: 400px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-right: 10px;
+}
+
+.message {
+  max-width: 80%;
+  padding: 10px 15px;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.userMessage {
+  align-self: flex-end;
+  background-color: var(--accent);
+  color: white;
+}
+
+.assistantMessage {
+  align-self: flex-start;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+}
+
+.errorMessage {
+  align-self: center;
+  background-color: var(--error);
+  color: white;
+  font-size: 0.85rem;
+}
+
+/* Tool Metadata */
+.toolMetadata {
+  margin-top: 5px;
+  font-size: 0.75rem;
+}
+
+.toolPill {
+  display: inline-block;
+  background-color: var(--bg-panel);
+  border: 1px solid var(--border);
+  padding: 2px 8px;
+  border-radius: 10px;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.toolDetails {
+  margin-top: 5px;
+  padding: 10px;
+  background-color: rgba(0,0,0,0.2);
+  border-radius: 6px;
+  font-family: monospace;
+  white-space: pre-wrap;
+}
+
+/* Input Area */
+.inputArea {
+  display: flex;
+  gap: 10px;
+}
+
+.inputField {
+  flex-grow: 1;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  color: white;
+  padding: 10px 15px;
+  border-radius: var(--radius-input);
+  outline: none;
+}
+
+.inputField:focus {
+  border-color: var(--accent);
+}
+
+.sendBtn {
+  background-color: var(--accent);
+  color: white;
+  border: none;
+  padding: 0 20px;
+  border-radius: var(--radius-input);
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.sendBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Quick Actions */
+.quickActionsGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.actionBtn {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.actionBtn:hover {
+  background-color: var(--border);
+}
+
+.actionBtn.active {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.inlineForm {
+  background-color: var(--bg-card);
+  padding: 15px;
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+}
+
+.formField {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.formField label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.formField input {
+  background-color: var(--bg-panel);
+  border: 1px solid var(--border);
+  color: white;
+  padding: 6px 10px;
+  border-radius: 4px;
+}
+
+.formActions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.submitBtn {
+  background-color: var(--success);
+  color: white;
+  border: none;
+  padding: 6px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.cancelBtn {
+  background-color: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  padding: 6px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Rotation Stats */
+.rotationTable {
+  font-family: monospace;
+  font-size: 0.85rem;
+  white-space: pre-wrap;
+  background-color: rgba(0,0,0,0.3);
+  padding: 10px;
+  border-radius: 6px;
+  overflow-x: auto;
+}
+
+/* Banner */
+.bannerContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100px;
+}
+
+.bannerName {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: var(--accent);
+}
+
+.bannerTurn {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+/* Status */
+.statusBadge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.dot.connected { background-color: var(--success); }
+.dot.disconnected { background-color: var(--error); }
+.dot.unknown { background-color: gray; }
