@@ -25,22 +25,23 @@ export default function ChatInput({ onSend, isLoading }: ChatInputProps) {
   };
 
   return (
-    <div className={styles.inputArea}>
+    <div className={styles.chatInputWrap}>
       <input
         type="text"
-        className={styles.inputField}
+        className={styles.chatInput}
         placeholder="Ask anything — e.g. Who's next? Mark Ali's turn done."
         value={input}
-        onChange={(e) => setInput(e.target.value)}
+        onChange={e => setInput(e.target.value)}
         onKeyDown={handleKeyDown}
         disabled={isLoading}
       />
-      <button 
-        className={styles.sendBtn} 
+      <button
+        className={styles.sendBtn}
         onClick={handleSend}
         disabled={!input.trim() || isLoading}
+        aria-label="Send"
       >
-        Send
+        ➤
       </button>
     </div>
   );

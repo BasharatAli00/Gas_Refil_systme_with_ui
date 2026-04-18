@@ -1,5 +1,91 @@
-/* ─── Shell & Layout ─────────────────────────────────────── */
+# Gas Tracker — Frontend Enhancement Spec
 
+> **Scope:** UI/UX only. No backend, MCP tools, or API logic touched.  
+> **Aesthetic direction:** Dark industrial-utility — like a control room dashboard. Think oil-rig gauges, neon flame accents, heavy monospace numbers, tactile buttons.  
+> **Tone:** Serious utility with a single playful personality (the flame 🔥).
+
+---
+
+## 1. Design System — CSS Variables (replace current)
+
+Edit `dashboard.module.css` — replace the `:root` block:
+
+```css
+:root {
+  /* Core palette */
+  --bg:          #0a0b0d;
+  --surface:     #111318;
+  --surface-2:   #181c24;
+  --border:      #1f2535;
+  --border-glow: #ff6b2240;
+
+  /* Accent — flame orange */
+  --accent:      #ff6b22;
+  --accent-dim:  #ff6b2233;
+  --accent-text: #ffb347;
+
+  /* Status */
+  --green:  #22c55e;
+  --yellow: #eab308;
+  --red:    #ef4444;
+  --muted:  #4b5563;
+
+  /* Typography */
+  --font-display: 'Orbitron', monospace;   /* import from Google Fonts */
+  --font-body:    'IBM Plex Mono', monospace;
+  --font-ui:      'Inter', sans-serif;
+
+  /* Spacing scale */
+  --r-sm: 4px;
+  --r-md: 8px;
+  --r-lg: 14px;
+
+  /* Shadows */
+  --shadow-flame: 0 0 20px #ff6b2233, 0 0 60px #ff6b2211;
+  --shadow-card:  0 4px 24px rgba(0,0,0,0.6);
+}
+```
+
+Add to `<head>` in `layout.tsx` (or `_document.tsx`):
+```html
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+```
+
+---
+
+## 2. Global Layout (`page.tsx`)
+
+### Before (conceptual):
+Simple stacked components, plain dark background.
+
+### After — Grid layout:
+```tsx
+// page.tsx JSX structure
+<div className={styles.shell}>
+  <header className={styles.header}>
+    <span className={styles.logo}>⛽ GAS TRACKER</span>
+    <StatusIndicator />
+  </header>
+
+  <main className={styles.grid}>
+    <section className={styles.colLeft}>
+      <TurnBanner />
+      <QuickActions />
+    </section>
+    <section className={styles.colRight}>
+      <RotationTable />
+    </section>
+    <section className={styles.colFull}>
+      <ChatHistory />
+      <ChatInput />
+    </section>
+  </main>
+</div>
+```
+
+### CSS for layout:
+```css
 .shell {
   min-height: 100vh;
   background: var(--bg);
@@ -47,14 +133,20 @@
 .colRight { grid-column: 2; }
 .colFull  { grid-column: 1 / -1; }
 
+/* Mobile */
 @media (max-width: 768px) {
   .grid { grid-template-columns: 1fr; padding: 16px; }
   .colRight, .colFull { grid-column: 1; }
-  .header { padding: 12px 16px; }
 }
+```
 
-/* ─── TurnBanner ─────────────────────────────────────────── */
+---
 
+## 3. `TurnBanner` Component
+
+The most important component — make it feel like a live alert panel.
+
+```css
 .turnBanner {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -66,6 +158,7 @@
   overflow: hidden;
 }
 
+/* Ambient glow behind the name */
 .turnBanner::before {
   content: '';
   position: absolute;
@@ -92,6 +185,7 @@
   text-shadow: 0 0 30px #ff6b2266;
   line-height: 1;
   margin-bottom: 8px;
+  /* Animate in on data load */
   animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
@@ -101,18 +195,12 @@
   font-family: var(--font-ui);
 }
 
-.bannerHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 4px;
-}
-
 @keyframes slideUp {
   from { opacity: 0; transform: translateY(12px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
+/* "YOUR TURN" badge */
 .myTurnBadge {
   display: inline-flex;
   align-items: center;
@@ -133,40 +221,24 @@
   0%, 100% { box-shadow: 0 0 0 0 var(--border-glow); }
   50%       { box-shadow: 0 0 0 6px transparent; }
 }
+```
 
-.refreshBtn {
-  background: none;
-  border: 1px solid var(--border);
-  color: var(--muted);
-  padding: 4px 10px;
-  border-radius: var(--r-sm);
-  cursor: pointer;
-  font-size: 0.72rem;
-  font-family: var(--font-ui);
-  transition: all 0.15s ease;
-  flex-shrink: 0;
-}
+---
 
-.refreshBtn:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-}
+## 4. `RotationTable` Component
 
-/* ─── RotationTable ──────────────────────────────────────── */
+Make it look like a leaderboard / mission roster.
 
+```css
 .rotationCard {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--r-lg);
   overflow: hidden;
   box-shadow: var(--shadow-card);
-  height: 100%;
 }
 
 .rotationTitle {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   font-family: var(--font-display);
   font-size: 0.65rem;
   letter-spacing: 0.25em;
@@ -190,6 +262,7 @@
 .rotationRow:last-child { border-bottom: none; }
 .rotationRow:hover { background: var(--surface-2); }
 
+/* Highlight the current turn row */
 .rotationRow.active {
   background: var(--accent-dim);
   border-left: 2px solid var(--accent);
@@ -207,7 +280,6 @@
   font-weight: 500;
   color: #e2e8f0;
 }
-
 .rotationRow.active .rowName { color: var(--accent-text); }
 
 .rowCount {
@@ -221,20 +293,16 @@
   border-radius: 50%;
   background: var(--muted);
 }
-
 .rowStatus.current { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+```
 
-.rotationRaw {
-  font-family: var(--font-body);
-  font-size: 0.8rem;
-  white-space: pre-wrap;
-  padding: 16px 20px;
-  color: #e2e8f0;
-  line-height: 1.7;
-}
+---
 
-/* ─── QuickActions ───────────────────────────────────────── */
+## 5. `QuickActions` Component
 
+Big tactile buttons — feel like physical controls.
+
+```css
 .quickActions {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -258,6 +326,15 @@
   overflow: hidden;
 }
 
+.actionBtn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--accent);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
 .actionBtn:hover {
   border-color: var(--accent);
   transform: translateY(-1px);
@@ -266,15 +343,16 @@
 
 .actionBtn:active {
   transform: translateY(0px) scale(0.98);
+  border-color: var(--accent);
 }
 
-.actionBtn:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-  transform: none;
-}
+/* Loading spinner overlay */
+.actionBtn.loading { pointer-events: none; opacity: 0.6; }
 
-.btnIcon { font-size: 1.2rem; line-height: 1; }
+.btnIcon {
+  font-size: 1.2rem;
+  line-height: 1;
+}
 
 .btnLabel {
   font-size: 0.75rem;
@@ -284,10 +362,11 @@
 }
 
 .btnSub {
-  font-size: 0.63rem;
+  font-size: 0.65rem;
   color: var(--muted);
 }
 
+/* Primary action (mark done) spans full width and glows */
 .actionBtn.primary {
   grid-column: 1 / -1;
   flex-direction: row;
@@ -297,85 +376,47 @@
   border-color: var(--accent);
   background: var(--accent-dim);
 }
-
 .actionBtn.primary .btnLabel { font-size: 0.85rem; color: var(--accent-text); }
 .actionBtn.primary:hover { box-shadow: var(--shadow-flame); }
+```
 
-.inlineForm {
-  background: var(--surface-2);
-  padding: 16px;
-  border: 1px solid var(--accent);
-  border-radius: var(--r-md);
-  margin-top: 4px;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 12px;
-  grid-column: 1 / -1;
-}
+In `QuickActions.tsx`, wire up buttons like:
+```tsx
+<button className={`${styles.actionBtn} ${styles.primary}`} onClick={() => sendChat("mark my turn done")}>
+  <span className={styles.btnIcon}>🔥</span>
+  <div>
+    <div className={styles.btnLabel}>Mark My Turn Done</div>
+    <div className={styles.btnSub}>Record refill & advance rotation</div>
+  </div>
+</button>
+<button className={styles.actionBtn} onClick={() => sendChat("skip my turn")}>
+  <span className={styles.btnIcon}>⏭</span>
+  <div className={styles.btnLabel}>Skip Turn</div>
+  <div className={styles.btnSub}>Pass to next</div>
+</button>
+<button className={styles.actionBtn} onClick={() => sendChat("show history")}>
+  <span className={styles.btnIcon}>📋</span>
+  <div className={styles.btnLabel}>History</div>
+  <div className={styles.btnSub}>Past refills</div>
+</button>
+<button className={styles.actionBtn} onClick={() => sendChat("show rotation")}>
+  <span className={styles.btnIcon}>🔄</span>
+  <div className={styles.btnLabel}>Rotation</div>
+  <div className={styles.btnSub}>Full order</div>
+</button>
+```
 
-.formField {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
+---
 
-.formField label {
-  font-size: 0.72rem;
-  color: var(--muted);
-  font-family: var(--font-ui);
-}
+## 6. `ChatHistory` Component
 
-.formField input {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  color: #e2e8f0;
-  padding: 7px 10px;
-  border-radius: var(--r-sm);
-  font-family: var(--font-body);
-  font-size: 0.8rem;
-  outline: none;
-}
+Terminal-style message log.
 
-.formField input:focus { border-color: var(--accent); }
-
-.formActions {
-  grid-column: 1 / -1;
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-  margin-top: 2px;
-}
-
-.submitBtn {
-  background: var(--green);
-  color: #000;
-  border: none;
-  padding: 7px 16px;
-  border-radius: var(--r-sm);
-  cursor: pointer;
-  font-size: 0.78rem;
-  font-family: var(--font-ui);
-  font-weight: 600;
-}
-
-.cancelBtn {
-  background: transparent;
-  border: 1px solid var(--border);
-  color: var(--muted);
-  padding: 7px 16px;
-  border-radius: var(--r-sm);
-  cursor: pointer;
-  font-size: 0.78rem;
-  font-family: var(--font-ui);
-}
-
-/* ─── ChatHistory ────────────────────────────────────────── */
-
+```css
 .chatHistory {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-bottom: none;
-  border-radius: var(--r-lg) var(--r-lg) 0 0;
+  border-radius: var(--r-lg);
   overflow: hidden;
   box-shadow: var(--shadow-card);
 }
@@ -393,25 +434,27 @@
   text-transform: uppercase;
 }
 
+/* Blinking cursor in header to signal live */
 .chatHeader::after {
   content: '▊';
   color: var(--accent);
   animation: blink 1s step-end infinite;
 }
-
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
 
 .chatScroll {
-  height: 320px;
+  max-height: 320px;
   overflow-y: auto;
   padding: 16px 20px;
   display: flex;
   flex-direction: column;
   gap: 12px;
+  /* Thin scrollbar */
   scrollbar-width: thin;
   scrollbar-color: var(--border) transparent;
 }
 
+/* Messages */
 .msgUser {
   align-self: flex-end;
   background: var(--accent-dim);
@@ -438,17 +481,7 @@
   animation: fadeInLeft 0.25s ease both;
 }
 
-.msgError {
-  align-self: center;
-  background: #ef444420;
-  border: 1px solid #ef4444;
-  border-radius: var(--r-md);
-  padding: 10px 14px;
-  font-size: 0.8rem;
-  color: #fca5a5;
-  font-family: var(--font-ui);
-}
-
+/* Tool used badge inside bot message */
 .toolBadge {
   display: inline-flex;
   align-items: center;
@@ -462,49 +495,26 @@
   border-radius: 3px;
   padding: 2px 7px;
   margin-bottom: 6px;
-  cursor: pointer;
 }
 
-.toolDetails {
-  margin-top: 6px;
-  padding: 10px;
-  background: rgba(0,0,0,0.4);
-  border-radius: var(--r-sm);
-  font-family: var(--font-body);
-  font-size: 0.75rem;
-  white-space: pre-wrap;
-  color: var(--muted);
-}
+@keyframes fadeInRight { from { opacity:0; transform:translateX(8px) } }
+@keyframes fadeInLeft  { from { opacity:0; transform:translateX(-8px) } }
+```
 
-.msgEmpty {
-  align-self: center;
-  color: var(--muted);
-  font-size: 0.8rem;
-  font-family: var(--font-ui);
-  margin: auto;
-}
+---
 
-.msgThinking {
-  align-self: flex-start;
-  color: var(--muted);
-  font-size: 0.82rem;
-  font-family: var(--font-body);
-  animation: fadeInLeft 0.25s ease both;
-}
+## 7. `ChatInput` Component
 
-@keyframes fadeInRight { from { opacity:0; transform:translateX(8px) } to { opacity:1; transform:translateX(0) } }
-@keyframes fadeInLeft  { from { opacity:0; transform:translateX(-8px) } to { opacity:1; transform:translateX(0) } }
+Floating command bar feel.
 
-/* ─── ChatInput ──────────────────────────────────────────── */
-
+```css
 .chatInputWrap {
   display: flex;
   gap: 10px;
-  padding: 14px 20px;
-  border: 1px solid var(--border);
-  border-top: none;
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
   background: var(--surface);
-  border-radius: 0 0 var(--r-lg) var(--r-lg);
+  /* Attach to chat history box bottom */
 }
 
 .chatInput {
@@ -519,9 +529,7 @@
   outline: none;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
-
 .chatInput::placeholder { color: var(--muted); }
-
 .chatInput:focus {
   border-color: var(--accent);
   box-shadow: 0 0 0 3px var(--accent-dim);
@@ -539,13 +547,18 @@
   transition: all 0.15s ease;
   flex-shrink: 0;
 }
-
 .sendBtn:hover { background: var(--accent-text); transform: scale(1.05); }
 .sendBtn:active { transform: scale(0.95); }
 .sendBtn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+```
 
-/* ─── StatusIndicator ────────────────────────────────────── */
+---
 
+## 8. `StatusIndicator` Component
+
+Replace the plain text indicator with a live-feeling pulse.
+
+```css
 .statusIndicator {
   display: flex;
   align-items: center;
@@ -561,12 +574,11 @@
   background: var(--muted);
   transition: background 0.3s ease;
 }
-
 .statusDot.online {
   background: var(--green);
+  box-shadow: 0 0 0 0 #22c55e66;
   animation: ripple 2s ease-out infinite;
 }
-
 .statusDot.error { background: var(--red); }
 
 @keyframes ripple {
@@ -574,16 +586,32 @@
   70%  { box-shadow: 0 0 0 8px transparent; }
   100% { box-shadow: 0 0 0 0 transparent; }
 }
+```
 
-/* ─── Skeleton ───────────────────────────────────────────── */
+```tsx
+// StatusIndicator.tsx
+export function StatusIndicator({ status }: { status: 'online'|'offline'|'loading' }) {
+  const label = { online: 'BACKEND LIVE', offline: 'OFFLINE', loading: 'CONNECTING...' }
+  return (
+    <div className={styles.statusIndicator}>
+      <div className={`${styles.statusDot} ${status === 'online' ? styles.online : status === 'error' ? styles.error : ''}`} />
+      <span>{label[status]}</span>
+    </div>
+  )
+}
+```
 
+---
+
+## 9. Loading Skeleton (add to all data-dependent components)
+
+```css
 .skeleton {
   background: linear-gradient(90deg, var(--surface) 25%, var(--surface-2) 50%, var(--surface) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.4s infinite;
   border-radius: var(--r-sm);
 }
-
 @keyframes shimmer {
   0%   { background-position: 200% 0; }
   100% { background-position: -200% 0; }
@@ -592,20 +620,15 @@
 .skeletonLine { height: 14px; margin-bottom: 8px; }
 .skeletonLine.short { width: 40%; }
 .skeletonLine.long  { width: 80%; }
+```
 
-.globalSkeleton {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 60vh;
-  color: var(--muted);
-  font-family: var(--font-display);
-  font-size: 0.7rem;
-  letter-spacing: 0.25em;
-}
+In TSX use like: `{loading ? <div className={`${styles.skeleton} ${styles.skeletonLine}`} /> : <ActualContent />}`
 
-/* ─── Empty & Error States ───────────────────────────────── */
+---
 
+## 10. Empty & Error States
+
+```css
 .emptyState {
   display: flex;
   flex-direction: column;
@@ -629,3 +652,89 @@
   color: #fca5a5;
   font-family: var(--font-ui);
 }
+```
+
+---
+
+## 11. `page.tsx` — `fetchInitialData` UX improvement
+
+Ensure both API calls resolve before revealing the grid (prevents layout flash):
+
+```tsx
+const [ready, setReady] = useState(false)
+
+useEffect(() => {
+  Promise.all([fetchTurn(), fetchRotation()])
+    .finally(() => setReady(true))
+}, [])
+
+// In JSX:
+{!ready
+  ? <div className={styles.globalSkeleton}>/* skeleton grid */</div>
+  : <main className={styles.grid}>...</main>
+}
+```
+
+---
+
+## 12. Quick Win — `globals.css` resets
+
+```css
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { font-size: 16px; }
+
+body {
+  background: #0a0b0d;
+  color: #e2e8f0;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Kill default button styles */
+button { cursor: pointer; font: inherit; background: none; border: none; }
+
+/* Remove ugly blue autofill */
+input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 100px var(--surface) inset;
+  -webkit-text-fill-color: #e2e8f0;
+}
+```
+
+---
+
+## Implementation Priority (to save API tokens)
+
+Do these in order — each gives big visual payoff per minute of work:
+
+| # | Task | Impact | Time |
+|---|------|--------|------|
+| 1 | CSS variables + grid background + fonts | 🔥🔥🔥 | 10 min |
+| 2 | `TurnBanner` glow + animation | 🔥🔥🔥 | 10 min |
+| 3 | `QuickActions` tactile buttons | 🔥🔥 | 8 min |
+| 4 | `RotationTable` row styling | 🔥🔥 | 8 min |
+| 5 | `ChatHistory` terminal style | 🔥🔥 | 10 min |
+| 6 | `StatusIndicator` pulse dot | 🔥 | 5 min |
+| 7 | Skeleton loading states | 🔥 | 10 min |
+
+---
+
+## File Checklist
+
+```
+gastracker-ui/frontend/
+├── styles/
+│   ├── dashboard.module.css   ← bulk of changes (sections 1-10)
+│   └── globals.css            ← section 12
+├── app/
+│   ├── layout.tsx             ← add Google Fonts <link>
+│   └── page.tsx               ← grid layout + fetchInitialData (sections 2, 11)
+└── components/
+    ├── TurnBanner.tsx          ← section 3
+    ├── RotationTable.tsx       ← section 4
+    ├── QuickActions.tsx        ← section 5
+    ├── ChatHistory.tsx         ← section 6
+    ├── ChatInput.tsx           ← section 7
+    └── StatusIndicator.tsx     ← section 8
+```
+
+> **No backend files, no MCP tools, no API routes were modified.**

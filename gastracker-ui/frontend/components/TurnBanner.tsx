@@ -9,31 +9,31 @@ interface TurnBannerProps {
 }
 
 export default function TurnBanner({ currentTurn, onRefresh, isLoading }: TurnBannerProps) {
-  // Parse something like "It's UK's turn (turn #3)"
-  const nameMatch = currentTurn.match(/It's (.*?)'s turn/);
-  const turnMatch = currentTurn.match(/\(turn #(.*?)\)/);
+  const nameMatch = currentTurn.match(/It's (.*?)'s turn/i);
+  const turnMatch = currentTurn.match(/\(turn #(.*?)\)/i);
 
-  const name = nameMatch ? nameMatch[1] : "Unknown";
-  const turnLabel = turnMatch ? `Turn #${turnMatch[1]}` : "";
+  const name = nameMatch ? nameMatch[1] : null;
+  const turnLabel = turnMatch ? `Turn #${turnMatch[1]}` : null;
 
   return (
-    <div className={styles.panel}>
-      <div className={styles.panelHeader}>
-        <h2>Currently Filling</h2>
+    <div className={styles.turnBanner}>
+      <div className={styles.bannerHeader}>
+        <div className={styles.bannerLabel}>Currently Filling</div>
         <button className={styles.refreshBtn} onClick={onRefresh} disabled={isLoading}>
-          {isLoading ? "..." : "Refresh"}
+          {isLoading ? "..." : "↻ Refresh"}
         </button>
       </div>
-      <div className={styles.bannerContent}>
-        {currentTurn ? (
-          <>
-            <div className={styles.bannerName}>{name}</div>
-            <div className={styles.bannerTurn}>{turnLabel}</div>
-          </>
-        ) : (
-          <div className={styles.bannerTurn}>{isLoading ? "Fetching..." : "No data"}</div>
-        )}
-      </div>
+
+      {name ? (
+        <>
+          <div className={styles.bannerName}>{name}</div>
+          {turnLabel && <div className={styles.bannerSub}>{turnLabel}</div>}
+        </>
+      ) : (
+        <div className={styles.bannerName} style={{ fontSize: "1rem", color: "var(--muted)" }}>
+          {isLoading ? "Fetching..." : "—"}
+        </div>
+      )}
     </div>
   );
 }

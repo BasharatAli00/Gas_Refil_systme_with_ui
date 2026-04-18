@@ -1,24 +1,26 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import styles from "../styles/dashboard.module.css";
 
 interface StatusIndicatorProps {
-  status: "connected" | "disconnected" | "unknown";
+  status: "online" | "offline" | "loading";
 }
 
 export default function StatusIndicator({ status }: StatusIndicatorProps) {
-  const getStatusText = () => {
-    switch (status) {
-      case "connected": return "Connected";
-      case "disconnected": return "Disconnected";
-      default: return "Starting...";
-    }
-  };
+  const label = {
+    online: "BACKEND LIVE",
+    offline: "OFFLINE",
+    loading: "CONNECTING...",
+  }[status];
 
   return (
-    <div className={styles.statusBadge}>
-      <span className={`${styles.dot} ${styles[status]}`}></span>
-      <span>{getStatusText()}</span>
+    <div className={styles.statusIndicator}>
+      <div
+        className={`${styles.statusDot} ${
+          status === "online" ? styles.online : status === "offline" ? styles.error : ""
+        }`}
+      />
+      <span>{label}</span>
     </div>
   );
 }

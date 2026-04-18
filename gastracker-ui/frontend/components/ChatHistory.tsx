@@ -19,40 +19,49 @@ export default function ChatHistory({ messages, isLoading }: ChatHistoryProps) {
   }, [messages, isLoading]);
 
   return (
-    <div className={styles.chatHistory} ref={scrollRef}>
-      {messages.length === 0 && (
-        <div className={styles.assistantMessage} style={{ alignSelf: 'center', opacity: 0.5 }}>
-          No messages yet. Ask me anything about the gas tracker!
-        </div>
-      )}
-      {messages.map((m) => (
-        <div key={m.id} className={`${styles.message} ${m.role === 'user' ? styles.userMessage : m.role === 'error' ? styles.errorMessage : styles.assistantMessage}`}>
-          {m.content}
-          
-          {m.tool_used && (
-            <div className={styles.toolMetadata}>
-              <div 
-                className={styles.toolPill} 
+    <div className={styles.chatHistory}>
+      <div className={styles.chatHeader}>Chat Log</div>
+      <div className={styles.chatScroll} ref={scrollRef}>
+        {messages.length === 0 && (
+          <div className={styles.msgEmpty}>
+            No messages yet — ask me anything about the gas tracker.
+          </div>
+        )}
+
+        {messages.map(m => (
+          <div
+            key={m.id}
+            className={
+              m.role === "user"
+                ? styles.msgUser
+                : m.role === "error"
+                ? styles.msgError
+                : styles.msgBot
+            }
+          >
+            {m.tool_used && (
+              <div
+                className={styles.toolBadge}
                 onClick={() => setExpandedId(expandedId === m.id ? null : m.id)}
               >
-                🔧 {m.tool_used}
+                ⚙ {m.tool_used}
               </div>
-              {expandedId === m.id && (
-                <div className={styles.toolDetails}>
-                  <strong>Args:</strong> {JSON.stringify(m.tool_args, null, 2)}
-                  {"\n\n"}
-                  <strong>Result:</strong> {m.tool_result}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      ))}
-      {isLoading && (
-        <div className={styles.assistantMessage}>
-          Thinking...
-        </div>
-      )}
+            )}
+            <div>{m.content}</div>
+            {expandedId === m.id && m.tool_used && (
+              <div className={styles.toolDetails}>
+                <strong>Args:</strong> {JSON.stringify(m.tool_args, null, 2)}
+                {"\n\n"}
+                <strong>Result:</strong> {m.tool_result}
+              </div>
+            )}
+          </div>
+        ))}
+
+        {isLoading && (
+          <div className={styles.msgThinking}>Thinking...</div>
+        )}
+      </div>
     </div>
   );
 }
